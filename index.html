@@ -51,12 +51,11 @@ h2 { font-size: 1.6rem; }
 [hidden] { display: none !important; }
 :focus-visible { outline: 3px solid var(--green); outline-offset: 2px; }
 
-.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,.88); border-radius: 18px; padding: 8px 14px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.score-chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
-
-.tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--line); background: rgba(255,255,255,.88); border-radius: 14px 14px 0 0; padding-inline: 6px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.tab { flex: 1; font: inherit; font-weight: 600; padding: 10px 4px; border: none; background: none; color: var(--muted); cursor: pointer; border-bottom: 4px solid transparent; margin-bottom: -2px; }
-.tab[aria-selected="true"] { color: var(--green); border-bottom-color: var(--green); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(10,46,30,.80); border-radius: 16px; padding: 8px 10px 8px 16px; box-shadow: 0 4px 16px rgba(0,0,0,.28); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.top h1 { color: #fff; font-size: 1.5rem; }
+body.playing .top { display: none; }
+.score-chip { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; background: var(--gold); color: var(--ink); border: 0; border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+.score-chip::after { content: ""; width: 7px; height: 7px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); }
 
 .panel { display: flex; flex-direction: column; gap: 16px; }
 .card-box { background: var(--card); border-radius: 22px; padding: 22px 18px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 2px 12px rgba(23,38,31,.06); }
@@ -72,6 +71,9 @@ h2 { font-size: 1.6rem; }
 
 /* Game */
 .meter { display: flex; align-items: center; gap: 12px; }
+.back { font: inherit; font-weight: 600; font-size: .95rem; padding: 6px 14px; border-radius: 999px; border: 0; background: var(--green-soft); color: var(--green); cursor: pointer; white-space: nowrap; }
+.del { display: inline-block; font-size: 1.5em; line-height: 1; transform: scaleX(-1); }
+.card-box > .back.solo { align-self: flex-start; }
 .bar { flex: 1; height: 10px; background: var(--green-soft); border-radius: 999px; overflow: hidden; }
 .fill { height: 100%; width: 0; background: var(--green); border-radius: 999px; transition: width .3s; }
 .count { color: var(--muted); font-weight: 800; font-variant-numeric: tabular-nums; direction: ltr; }
@@ -123,7 +125,14 @@ h2 { font-size: 1.6rem; }
 
 /* Touch: no double-tap zoom, no text selection on controls, no grey tap flash */
 button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-.key, .chip, .tab, .btn { -webkit-user-select: none; user-select: none; }
+.key, .chip, .btn, .back, .score-chip { -webkit-user-select: none; user-select: none; }
+
+/* Very narrow phones: keep the title on one line */
+@media (max-width: 360px) {
+  .top { padding: 8px 8px 8px 12px; gap: 8px; }
+  .top h1 { font-size: 1.2rem; white-space: nowrap; }
+  .score-chip { padding: 6px 10px; gap: 6px; font-size: .88rem; }
+}
 
 /* Tablet (iPad portrait and up): wider column, larger type and touch targets */
 @media (min-width: 700px) {
@@ -131,15 +140,15 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   .app { max-width: 640px; gap: 22px; }
   h1 { font-size: 2.1rem; }
   h2 { font-size: 1.9rem; }
-  .top { padding: 10px 20px; border-radius: 22px; }
+  .top { padding: 10px 14px 10px 22px; border-radius: 22px; }
+  .top h1 { font-size: 1.9rem; }
   .score-chip { padding: 8px 18px; font-size: 1.15rem; }
-  .tabs { border-radius: 18px 18px 0 0; padding-inline: 10px; }
-  .tab { padding: 14px 6px; font-size: 1.1rem; }
   .card-box { padding: 32px 30px; border-radius: 28px; gap: 24px; }
   .chips { gap: 14px; }
   .chip { width: 72px; height: 72px; font-size: 1.8rem; }
   .btn { font-size: 1.6rem; padding: 20px 24px; border-radius: 20px; }
   .bar { height: 12px; }
+  .back { font-size: 1.1rem; padding: 10px 20px; }
   .q { font-size: 6rem; padding-block: 12px; }
   .typed { font-size: 3.2rem; min-height: 96px; border-radius: 20px; }
   .keypad { gap: 14px; }
@@ -165,7 +174,6 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   #game .typed-wrap { grid-column: 2; grid-row: 2 / span 2; }
   .key { min-height: 68px; }
   .album { grid-template-columns: repeat(6, 1fr); }
-  #setup, #end { max-width: 640px; width: 100%; margin-inline: auto; }
 }
 </style>
 </head>
@@ -173,16 +181,11 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 <div class="app" dir="rtl" lang="he">
   <div class="top">
     <h1>כפל בכדורגל</h1>
-    <div class="score-chip" id="scoreChip" aria-live="polite">⚽ 0</div>
-  </div>
-
-  <div class="tabs" role="tablist" aria-label="תפריט">
-    <button class="tab" role="tab" id="tab-play" aria-selected="true" aria-controls="p-play">משחק</button>
-    <button class="tab" role="tab" id="tab-album" aria-selected="false" aria-controls="p-album">האלבום</button>
+    <button type="button" class="score-chip" id="scoreChip" aria-label="האלבום שלי">⚽ אלבום 0/60</button>
   </div>
 
   <!-- PLAY -->
-  <section class="panel" id="p-play" role="tabpanel">
+  <section class="panel" id="p-play">
     <div class="card-box" id="setup">
       <h2 class="title">באיזה לוחות נתאמן היום?</h2>
       <div class="chips" id="tableChips" role="group" aria-label="בחירת לוחות כפל"></div>
@@ -191,6 +194,7 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 
     <div class="card-box" id="game" hidden>
       <div class="meter">
+        <button class="back" id="homeBtn" type="button" aria-label="חזרה למסך הראשון">→ חזרה</button>
         <div class="bar" aria-hidden="true"><div class="fill" id="fill"></div></div>
         <div class="count" id="roundInfo"></div>
       </div>
@@ -213,8 +217,9 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   </section>
 
   <!-- ALBUM -->
-  <section class="panel" id="p-album" role="tabpanel" hidden>
+  <section class="panel" id="p-album" hidden>
     <div class="card-box">
+      <button class="back solo" id="albumBack" type="button" aria-label="חזרה למסך הראשון">→ חזרה</button>
       <h2 class="title" id="albumCount"></h2>
       <div class="album" id="album"></div>
     </div>
@@ -388,17 +393,18 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   };
   function sfx(n) { try { SFX[n](); } catch (e) {} }
 
-  // tabs
-  var tabs = ['play', 'album'];
+  // screens: the score button in the header opens the album, the back button returns
   function showTab(name) {
-    tabs.forEach(function (t) {
-      $('tab-' + t).setAttribute('aria-selected', String(t === name));
-      $('p-' + t).hidden = t !== name;
-    });
+    ['play', 'album'].forEach(function (t) { $('p-' + t).hidden = t !== name; });
     if (name === 'album') renderAlbum();
+    window.scrollTo(0, 0);
   }
-  tabs.forEach(function (t) { $('tab-' + t).addEventListener('click', function () { showTab(t); }); });
-  function updateChip() { $('scoreChip').textContent = '⚽ ' + state.unlocked.length + '/' + TOTAL_CARDS; }
+  $('scoreChip').addEventListener('click', function () { showTab('album'); });
+  $('albumBack').addEventListener('click', function () { showTab('play'); });
+  function updateChip() {
+    $('scoreChip').textContent = '⚽ אלבום ' + state.unlocked.length + '/' + TOTAL_CARDS;
+    $('scoreChip').setAttribute('aria-label', 'האלבום שלי: ' + state.unlocked.length + ' מתוך ' + TOTAL_CARDS);
+  }
 
   var CHEERS = ['✓ כל הכבוד!', '✓ מעולה!', '✓ גוווול!', '✓ בול!', '✓ יפה מאוד!'];
   var MISSES = ['אוי, כמעט! נסו שוב', 'לא נורא, יש עוד ניסיון', 'קרוב! חשבו ונסו שוב', 'עוד רגע וזה שם, נסו שוב'];
@@ -426,7 +432,8 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   var padEl = $('keypad');
   ['1','2','3','4','5','6','7','8','9','⌫','0','✓'].forEach(function (k) {
     var b = document.createElement('button');
-    b.className = 'key' + (k === '✓' ? ' go' : ''); b.textContent = k;
+    b.className = 'key' + (k === '✓' ? ' go' : '');
+    if (k === '⌫') b.innerHTML = '<span class="del" aria-hidden="true">⌫</span>'; else b.textContent = k;
     b.setAttribute('aria-label', k === '⌫' ? 'מחיקה' : k === '✓' ? 'בדיקה' : k);
     b.addEventListener('click', function (e) { if (e.detail) b.blur(); pressKey(k); });
     padEl.appendChild(b);
@@ -451,7 +458,7 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   });
 
   // game
-  var qs = [], idx = 0, locked = false, attempt = 1;
+  var qs = [], idx = 0, locked = false, attempt = 1, round = 0;
   function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
   function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rnd(0, i); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
   function key(a, b) { return a + 'x' + b; }
@@ -464,7 +471,8 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   }
   function startRound() {
     if (!selected.length) return;
-    qs = buildQuestions(); idx = 0;
+    qs = buildQuestions(); idx = 0; round++;
+    document.body.classList.add('playing');
     $('setup').hidden = true; $('end').hidden = true; $('game').hidden = false;
     showQ();
   }
@@ -481,7 +489,7 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   }
   function submit(v) {
     if (locked) return; locked = true;
-    var q = qs[idx], c = q.a * q.b, k = key(q.a, q.b);
+    var q = qs[idx], c = q.a * q.b, k = key(q.a, q.b), r = round;
     var typed = $('typed'), fb = $('feedback');
 
     if (v === c) {
@@ -499,7 +507,7 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
       state.correct++;
       earned = state.correct % PER_CARD === 0 && state.unlocked.length < TOTAL_CARDS;
       save();
-      setTimeout(function () { if (earned) unlockCard(next); else next(); }, earned ? 500 : 900);
+      setTimeout(function () { if (r !== round) return; if (earned) unlockCard(next); else next(); }, earned ? 500 : 900);
       return;
     }
 
@@ -511,6 +519,7 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
       typed.className = 'typed wrong shake'; typed.textContent = v;
       fb.textContent = MISSES[rnd(0, MISSES.length - 1)]; fb.className = 'feedback bad';
       setTimeout(function () {
+        if (r !== round) return;
         typedVal = ''; typed.className = 'typed empty'; renderTyped();
         fb.textContent = '';
         setKeys(false);
@@ -524,7 +533,7 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     setKeys(true);
     typed.className = 'typed show'; typed.textContent = c; sfx('reveal');
     fb.textContent = 'התשובה היא ' + c + '. עוד נתרגל אותו'; fb.className = 'feedback info';
-    setTimeout(next, 2200);
+    setTimeout(function () { if (r === round) next(); }, 2200);
   }
   function next() {
     idx++;
@@ -533,10 +542,12 @@ button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   }
   function endRound() {
     $('game').hidden = true; $('end').hidden = false;
+    document.body.classList.remove('playing');
     sfx('win');
   }
   $('startBtn').addEventListener('click', startRound);
   $('againBtn').addEventListener('click', startRound);
+  $('homeBtn').addEventListener('click', function () { round++; document.body.classList.remove('playing'); $('game').hidden = true; $('end').hidden = true; $('setup').hidden = false; });
   $('backBtn').addEventListener('click', function () { $('end').hidden = true; $('setup').hidden = false; });
 
   // cards
